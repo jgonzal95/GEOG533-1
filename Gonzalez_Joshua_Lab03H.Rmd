@@ -1,0 +1,52 @@
+---
+title: "Gonzalez_Joshua_Lab03M"
+author: "Joshua Gonzalez"
+date: "10/3/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+##Question 1
+```{r}
+library(MASS)
+ds <- Cars93
+set.seed(100)
+ds2 <- sample(1:nrow(ds), 40)
+train <- ds[ds2,]
+test <- ds[-ds2,]
+sum(train$Origin == "USA")
+sum(train$Origin == "non-USA")
+```
+##Question 2
+```{r}
+births <- sample(c("B","G"), size = 10, replace = TRUE, prob = c(0.515, 0.485))
+table(births)
+births2 <- sample(c("B","G"), size = 10000, replace = TRUE, prob = c(0.515, 0.485))
+table(births2)
+
+```
+##Question 3
+```{r}
+
+ss <- dbinom(3, size = 10, prob = 0.515)
+ss2 <- pbinom(8, size = 10, prob = 0.485, lower.tail = FALSE)
+n <- 10
+x <- 0:10
+y <- dbinom(x,size = n,prob = 0.515)
+plot(x,y)
+
+n <- 10
+x <- 0:10
+y <- pbinom(x, size = n, prob = 0.485)
+plot(x,y)
+```
+##Question 4
+```{r}
+
+n <- 10
+x <- 0:20
+y <- dbinom(x,size = n,prob = 0.5)
+plot(x,y)
+```
