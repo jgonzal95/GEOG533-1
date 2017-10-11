@@ -1,0 +1,76 @@
+---
+title: "Gonzalez_Joshua_Lab04RM"
+author: "Joshua Gonzalez"
+date: "10/10/2017"
+output: html_document
+---
+
+##Question 1
+```{r}
+###a
+pnorm(20,mean = 32,sd = 7)
+curve(dnorm(x, mean = 32, sd = 7), from = 11, to = 53, main = '20 Points or Less')
+x <- c(11, seq(11, 20, 0.01), 20)
+y <- c(0, dnorm(seq(11, 20, 0.01), mean = 32, sd = 7), 0)
+polygon(x, y, col = 'blue')
+###b
+pnorm(35, mean = 32, sd = 7, lower.tail = FALSE)
+curve(dnorm(x, mean = 32, sd = 7), from = 11, to = 53, main = '35 Points or Higher')
+x <- c(11, seq(11, 20, 0.01), 35)
+y <- c(0, dnorm(seq(11, 20, 0.01), mean = 32, sd = 7), 0)
+polygon(x, y, col = 'blue')
+###c
+pnorm(40, mean = 32, sd = 7, lower.tail = FALSE) - pnorm(2, mean = 32, sd = 7, lower.tail = FALSE)
+curve(dnorm(x, mean = 32, sd = 7), from = 11, to = 53, main = 'Between 20 and 40 Points')
+x <- c(20, seq(20, 40, 0.01), 40)
+y <- c(0, dnorm(seq(20, 40, 0.01), mean = 32, sd = 7), 0)
+polygon(x, y, col = 'blue')
+```
+
+##Question 2
+```{r}
+###a
+pexp(3, rate = .1, lower.tail = TRUE)
+curve(dexp(x,1),xlim = c(0,5),ylim=c(0,1.6),lwd=2,col="red")
+x <- c(-9, seq(-9, 9, 0.01),9)
+y <- c(0, seq(-9,9,0.01),9)
+polygon(x, y, col = 'blue')
+###b
+pexp(20, rate = .1, lower.tail = FALSE)
+curve(dexp(x,1),xlim = c(0,5),ylim=c(0,1.6),lwd=2,col="red")
+x <- c(-400, seq(-400, 400, 0.01),400)
+y <- c(0, seq(-400,400,0.01),400)
+polygon(x, y, col = 'blue')
+###c
+pexp(10, rate = .1, lower.tail = FALSE) - pexp(5, rate = .1, lower.tail = FALSE)
+curve(dexp(x,1),xlim = c(0,5),ylim=c(0,1.6),lwd=2,col="red")
+x <- c(5, seq(5, 10, 0.01),10)
+y <- c(0, seq(5,10,0.01),10)
+polygon(x, y, col = 'blue')
+```
+
+
+##Question 3
+```{r}
+library(raster)
+###a
+rasa1 <- raster(nrows=30,ncols=30,xmn=0,xmx=10,ymn=0,ymx=10)
+rasa1[] <- runif(ncell(rasa1))
+plot(rasa1)
+hist(rasa1)
+###b
+rasb1 <- raster(nrows=30,ncols=30,xmn=0,xmx=10,ymn=0,ymx=10)
+rasb1[] <- rnorm(ncell(rasb1))
+plot(rasb1)
+hist(rasb1)
+###c
+rasmrg <- merge(rasa1, rasb1)
+plot(rasmrg)
+###d
+cellStats(rasmrg,"mean")
+rasmrg[1,1] <- 0
+rasmrg[rasmrg > 0.5] <- 1
+rasmrg2 <- rasmrg + rasmrg * 10
+writeRaster(rasmrg2,filename = "rasmrg.tif",overwrite = TRUE)
+```
+
