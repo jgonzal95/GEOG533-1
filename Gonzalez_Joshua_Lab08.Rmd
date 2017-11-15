@@ -1,334 +1,246 @@
 ---
-title: "Geog533 Lab 7 - Correlation"
-author: "Joshua Gonzalez"
+title: "Geog533 Lab 8"
+author: "Josh Gonzalez"
 output:
   html_document:
     toc: yes
   html_notebook:
     toc: yes
     toc_float: yes
-  pdf_document:
-    toc: yes
 ---
 
+Complete the following exercises in Chapter 8 (Introduction to Regression Analysis) of the textbook [R] pages 247-250. 
+
 ## Question 1
-This is Exercise 1 in Chapter 7 of the Textbook [R].
 
-### Problem 1a
-Find the correlation coefficient, *r*, for the following sample data on income and education:
+This is Exercise 1 in Chapter 8 of the Textbook [R].
+
+A regression of weekly shopping trip frequency on annual income (data entered in thousands of dollars) is performed on data collected from 24 respondents. The results are summarized below:
+
+* Intercept: 0.46
+* Slope: 0.19
+
+|          | Sum of squares  | Degrees of freedom |  Mean square   |       *F*       |
+|----------|-----------------|--------------------|----------------|-----------------|
+|Regression|                 |                    |                |                 |
+| Residual |       1.7       |                    |                |                 |
+| Total    |       2.3       |                    |                |                 |
+
+
+### Question 1(a)
+Fill in the blanks in the ANOVA table.
+
 ```{r}
-library(knitr)
-obs <- seq(1:5)
-income <- c(30,28,52,40,35)
-edu <- c(12,13,18,16,17)
-df <- data.frame(obs,income,edu)
-names(df) <- c("Observation","Income ($*1000)","Education (Years)")
-kable(df)
+n <- 24
+ssqr <- 2.3-1.7
+dof <- n-2 
+doftot <- n-1
+msr0 <- 1.7/dof
+msr1 <- round(msr0, 3)
+f <- round(ssqr/msr0, 2)
+f
 ```
 
-Solution 1a
+
+|          | Sum of squares  | Degrees of freedom |  Mean square   |       *F*       |
+|----------|-----------------|--------------------|----------------|-----------------|
+|Regression|      r 'ssqr'   |                    |     r 'ssqr'   |        r 'f'    |
+| Residual |       1.7       |         r 'dof'    |                |                 |
+| Total    |       2.3       |        r 'doftot'  |                |                 |
+
+
+### Question 1(b)
+What is the predicted number of weekly shopping trips for someone making $50,000/year?
 ```{r}
-cor1 <- cor(income, edu, method = "pearson")
-round(cor1, 3)
+0.46+(0.19*50)
 ```
 
 
-### Problem 1b
-Test the null hypothesis ρ = 0.
+### Question 1(c)
+In words, what is the meaning of the coefficient 0.19?
+A person will go on .19 shopping trips per week for every dollar they make.
 
-Solution 1b
+
+### Question 1(d)
+Is the regression coefficient significantly different from zero? How do you know?
 ```{r}
-cor2 <- cor.test(income, edu, method = "pearson")
-cor2
-
-pear <- cor2$p.value
-
-if(pear < 0.05){
-print("We reject the null hypothesis")
+c <- qf(.95,1,22)
+if(f < c){
+print("We cannot reject the null hypothesis")
 } else {
-print("We cannot reject the null hypothesis")}
+print("We reject the null hypothesis")}
 ```
+"This proves that the regression coefficient is signigicantly different than zero because the F value is greater than the critical F value"
 
 
-### Problem 1c
-Find Spearman’s rank correlation coefficient for these data.
-
-Solution 1c
+### Question 1(e)
+What is the value of the correlation coefficient?
 ```{r}
-rc <- cor(income, edu, method = "spearman")
-rc
+r <- sqrt(ssqr/2.3)
+round(r,3)
 ```
 
 
-### Problem 1d
-Test whether the observed value of rs from part (c) is significantly different from zero.
-
-Solution 1d
-```{r}
-tstsig <- cor.test(income, edu, method = "spearman")
-tstsig
-pear <- tstsig$p.value
-if(pear < 0.05){
-print("We reject the null hypothesis")
-} else {
-print("We cannot reject the null hypothesis")}
-```
 
 
 
 ## Question 2
-This is Exercise 3 in Chapter 7 of the Textbook [R].
 
-### Problem
-The distribution of the t-statistic for testing the significance of a correlation coefficient has n – 2 degrees of freedom. If the sample size is 36 and α = 0.05, what is the smallest absolute value a correlation coefficient must have to be significant? What if the sample size is 80?
+This is Exercise 6 in Chapter 8 of the Textbook [R].
 
-### Solution
+The following data are collected in an effort to determine whether snowfall is dependent upon elevation: 
+
+| Snowfall (inches) | Elevation (feet) |
+|-------------------|------------------|
+|       36          |       400        |
+|       78          |       800        |
+|       11          |       200        |
+|       45          |       675        |
+
+Using R, show your work on exercises (a) through (g).
+
+### Question 2(a)
+Find the regression coefficients (the intercept and the slope coefficient).
 ```{r}
-###a
-dst1 <- 36-2
-c1 <- qt(.975, dst1)
-rc1 <- c1/sqrt(dst1+c1^2)
-round(rc1, 3)
-
-###b
-dst2 <- 80-2
-c2 <- qt(.975, dst2)
-rc2 <- c2/sqrt(dst2+c2^2)
-round(rc2, 3)
+snow <- c(36,78,11,45)
+elev <- c(400,800,200,675)
+mn <- lm(snow~elev)
+summary(mn)
+int <- -7.63721
+round(int, 3)
+m <- 0.09665
+round(m, 3)
 ```
+
+
+### Question 2(b)
+Estimate the standard error of the residuals about the regression line.
+```{r}
+print("109.8 for 2 degrees of Freedom.")
+```
+
+
+### Question 2(c)
+Test the hypothesis that the regression coefficient associated with the independent variables is equal to zero. Also place a 95% confidence interval on the regression coefficient.
+```{r}
+f2 <- 16.7
+c2 <- qf(.95, 1, 2)
+if(f2 < c2){
+print("We cannot reject the null hypothesis") 
+} else {
+print("We reject the null hypothesis")}
+se <- 2.29
+q95 <- qnorm(0.975)
+c95 <- c(f2-q95*se, f2+q95*se)
+c95
+```
+
+
+### Question 2(d)
+Find the value of $r^2$.
+```{r}
+rsqrd <- 0.8899
+apprsqrd <- 0.8349
+```
+
+
+### Question 2(e)
+Make a table of the observed values, predicted values, and the residuals.
+```{r}
+dfse <- data.frame(snow,elev)
+dfse$predicted <- round(mn$fitted.values,3)
+dfse$residuals <- round(mn$residuals,3)
+names(dfse) <- c("Snowfall (In)", "Elevation (Ft)", "Predicted Values", "Residuals")
+library(knitr)
+kable(dfse)
+```
+
+
+### Question 2(f)
+Prepare an analysis of variance table portraying the regression results.
+```{r}
+anova(mn)
+```
+
+
+|          | Sum of squares  | Degrees of freedom |  Mean square   |       *F*       |
+|----------|-----------------|--------------------|----------------|-----------------|
+|Regression|      2047.77    |        1           |   2047.77      |        16.17    |
+| Residual |      253.23     |        2           |   126.61       |                 |
+| Total    |      2301       |        3           |                |                 |
+
+### Question 2(g)
+Graph the data and the regression line.
+```{r}
+plot(elev, snow)
+abline(mn, col = "blue", lwd = 2)
+segments(elev,fitted(mn),elev,snow,col="purple",lty = "dashed")
+```
+
 
 
 
 ## Question 3
-This is Exercise 4 in Chapter 7 of the Textbook [R].
+
+This is Exercise 10 in Chapter 8 of the Textbook [R].
+
+Use R and the [Milwaukee dataset](http://spatial.binghamton.edu/geog533/data/Milwaukee_Sales.csv) to:
 
 ### Problem
-Find the correlation coefficient for the following data:
-
-```{r}
-library(knitr)
-Obs <- seq(1:4)
-X <- c(2,8,9,7)
-Y <- c(6,6,10,4)
-df <- data.frame(Obs,X,Y)
-kable(df)
-```
+perform a regression using sales price as the dependent variable and lot size as the independent variable.
 
 ### Solution
 ```{r}
-cc <- cor(X,Y,method = "pearson")
-round(cc, 3)
+url = "http://spatial.binghamton.edu/geog533/data/Milwaukee_Sales.csv"
+rbing <- read.csv(url)
+
+site <- lm(rbing$SalePrice~rbing$LotSize)
+summary(site)
 ```
 
 
 
 ## Question 4
-This is Exercise 6 in Chapter 7 of the Textbook [R].
 
-### Problem
-Find the correlation coefficient between median annual income in the United States and the number of horse races won by the leading jockey, for the period 1984–1995. Test the hypothesis that the true correlation coefficient is equal to zero. Interpret your results.
+This is Exercise 11 in Chapter 8 of the Textbook [R].
+
+Use R and the Hypothetical [UK Housing Prices dataset](http://spatial.binghamton.edu/geog533/data/UK_Housing.csv) to:
+
+### Question 4(a) 
+perform a regression using house price as the dependent variable, and number of bedrooms as the independent variable;
 
 ```{r}
-year <- 1984:1994
-income <- c(35165,35778,37027,37256,37512,37997,37343,36054,35593,35241,35486)
-races <- c(399,469,429,450,474,598,364,430,433,410,317)
-df <- data.frame(year,income,races)
-names(df) <- c("Year","Median income","Number of races won by leading jockey")
-kable(df)
+url = "http://spatial.binghamton.edu/geog533/data/UK_Housing.csv"
+rbinguk <- read.csv(url)
+
+siteuk <- lm(rbinguk$price~rbinguk$bedrooms)
+summary(siteuk)
 ```
 
 
-### Solution
+### Question 4(b) 
+(b) repeat part (a), using the number of bathrooms as the independent variable, and comment on the results.
 ```{r}
-cor <- cor.test(income, races, method = "pearson")
-cor
-round(cor$estimate,3)
-pear <- cor$p.value
-if(pear < 0.05){
-print("We reject the null hypothesis")
-} else {
-print("We fail to reject the null hypothesis")}
-```
+bathind <- lm(rbinguk$price~rbinguk$bathrooms)
 
+summary(bathind)
+```
 
 
 ## Question 5
-This is Exercise 7 in Chapter 7 of the Textbook [R].
-
-### Problem
-For the following ranked data, find Spearman’s r, and then test the null hypothesis (using a Type I error probability of 0.10) that the true correlation is equal to zero.
+Download the [hometown.csv](http://spatial.binghamton.edu/geog533/data/hometown.csv), append your name and hometown coordinates to the csv, then use [leaflet](https://rstudio.github.io/leaflet/) to create a web map (10 pt.)
 
 ```{r}
-library(knitr)
-obs <- 1:6
-x <- c(1,2,5,6,11,12)
-y <- c(8,4,12,3,10,7)
-df <- data.frame(obs,x,y)
-names(df) <- c("Observation","Rank of x","Rank of y")
-kable(df)
-```
+dfbing <- read.csv("hometown.csv")
+View(dfbing)
+datame <-data.frame(lastname="Gonzalez", firstname="Joshua",type="student",location="40.7831,-73.9712",latitude = 40.7831,longitude = -73.9712,image="",fullname= "Joshua Gonzalez",popup="")
+dfbing2 <- rbind(dfbing, datame)
+View(dfbing2)
 
-
-### Solution
-```{r}
-test <- cor.test(x,y,method = "spearman")
-test
-round(test$estimate,3)
-pear <- 1
-if(pear < .10){
-print("We reject the null hypothesis")
-} else {
-print("We fail to reject the null hypothesis")}
-```
-
-
-
-## Question 6
-This is Exercise 8 in Chapter 7 of the Textbook [R].
-
-### Problem
-Find Pearson’s r for the following data, and then test the null hypothesis that the correlation coefficient is equal to zero. Use a Type I error probability of 0.05.
-
-```{r}
-library(knitr)
-obs <- 1:6
-x <- c(3.2,2.4,1.6,8.3,7.2,5.1)
-y <- c(6.2,7.3,8.1,2.6,6.3,4.3)
-df <- data.frame(obs,x,y)
-names(df) <- c("Observation","x","y")
-kable(df)
-```
-
-
-### Solution
-```{r}
-test <- cor.test(x,y,method = "pearson")
-test
-round(test$estimate, 3)
-pear <- test$p.value
-if(pear < 0.05){
-print("We reject the null hypothesis")
-} else {
-print("We fail to reject the null hypothesis")}
-```
-
-
-## Question 7
-This is Exercise 9 in Chapter 7 of the Textbook [R].
-
-### Problem
-Using R and the Milwaukee dataset, find the correlation between number of bedrooms and lot size.
-
-### Solution
-```{r}
-#milwa <- read.csv("Milwaukee.csv")
-#corr <- cor(milwa$Bedrms,milwa$LotSize, method = "pearson")
-#round(corr, 3)
-#CSV File Broken
-```
-
-
-## Question 8
-This is Exercise 10 in Chapter 7 of the Textbook [R].
-
-### Problem
-Using R and the Hypothetical UK Housing Prices dataset, find the correlation between floor area and number of bedrooms.
-
-### Solution
-```{r}
-#ukhous <- read.csv("UK_Housing.csv")
-#corr <- cor(ukhous$floorarea,ukhous$bedrooms, method = "pearson")
-#round(corr, 3)
-#CSV File Broken
-```
-
-
-## Question 9
-Use the **cars** data frame in the **datasets** package to perform the following tasks: 
-
-### Problem 9a
-Plot a scatterplot for the data frame (x: speed, y: dist)
-
-Solution 9a
-```{r}
-library(CARS)
-df <- cars
-dfs <- df$speed
-dfd <- df$dist
-plot(dfs, dfd, main = "Cars", xlab = "Speed", ylab = "Distance", pch = 16)
-```
-
-
-### Problem 9b
-How many rows in the data frame?
-
-Solution 9b
-```{r}
-nrow(df)
-```
-
-
-### Problem 9c
-Calculate Pearson’s correlation coefficient using the equation below:
-$$r=\frac{\sum_{n}^{i=1}(x_i-\bar{x})(y_i-\bar{y})}{(n-1)s_{x}s_{y}}$$
-
-Solution 9c
-```{r}
-xm <- mean(dfs)
-ym <- mean(dfd)
-
-xc <- dfs - xm
-yc <- dfd - ym
-
-sumc <- sum(xc*yc)
-
-sx <- sd(dfs)
-sy <- sd(dfd)
-
-rc <- sumc/(49*sx*sy)
-round(rc,3)
-```
-
-
-### Problem 9d
-Use the cor.test() function to find Pearson’s correlation coefficient and compare it to the one from part (c)
-
-Solution 9d
-```{r}
-test <- cor.test(dfs, dfd, method = "pearson")
-test
-
-round(test$estimate,3)
-```
-
-
-### Problem 9e
-Calculate Spearman’s rank correlation coefficient using the equation below:
-$$r_{S} = 1 - \frac{6\sum_{i=1}^{n}d_{i}^{2}}{n^3-n}$$
-
-Solution 9e
-```{r}
-df$rankspeed <- rank(dfs)
-df$rankdistance <- rank(dfd)
-df$d <- df$rankspeed - df$rankdistance
-
-num <- 6*sum(df$d^2)
-den <- (50^3)-50
-
-rt <- 1-(num/den)
-round(rt, 3)
-```
-
-
-
-### Problem 9f
-Use the cor.test() function to find Spearman’s rank correlation coefficient and compare it to the one from part (e)
-
-Solution 9f
-```{r}
-test <- cor.test(dfs,dfd, method = "spearman")
-test
-
-round(test$estimate,3)
+library(leaflet)
+m <- leaflet() %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(lng= -73.9712, lat= 40.7831, popup="Manhattan")
+m  # Print the map
 ```
 
