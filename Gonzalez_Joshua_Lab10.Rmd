@@ -1,0 +1,196 @@
+---
+title: "Geog533 Lab 10"
+author: "Joshua Gonzalez"
+output:
+  html_document:
+    toc: yes
+  html_notebook:
+    toc: yes
+    toc_float: yes
+---
+
+## Question 1
+Use R package UScensus2010county to complete the following tasks:  (20 pt.)
+```{r}
+if(!require(UScensus2010)) {install.packages("UScensus2010")}
+library(UScensus2010)
+if(!require(UScensus2010county)) {install.county("osx")}
+library(UScensus2010county)
+library(tmap)
+```
+### Question 1(a)
+Plot a map of New York counties using the plot function.
+```{r}
+data(new_york.county10)
+shpfile <- new_york.county10
+df1 <- shpfile@data
+df1
+plot(shpfile)
+```
+
+### Question 1(b)	
+Plot a map of New York counties using the qtm function.
+```{r}
+install.packages("tmap")
+library(tmap)
+qtm(shpfile)
+```
+
+
+### Question 1(c)	
+How many counties in New York State?
+```{r}
+df
+print("There are 62 counties in New York State")
+```
+
+### Question 1(d)	
+What’s the 3-digit fips code of Broome County?
+```{r}
+print("36007")
+```
+
+### Question 1(e)	
+Compute descriptive statistics of the population column (P0010001), including total, minimum, maximum, mean, median, and skewness. 
+```{r}
+library(moments)
+nypop <- df$P0010001
+sum(nypop)
+min(nypop)
+max(nypop)
+mean(nypop)
+median(nypop)
+skewness(nypop)
+```
+
+### Question 1(f)	
+Create a histogram and a boxplot of the population.
+```{r}
+a <- hist(nypop)
+a
+b <- boxplot(nypop)
+b
+```
+
+
+## Question 2
+Use R package UScensus2010tract to complete the following tasks:    (20 pt.)
+```{r}
+library(UScensus2010)
+if(!require(UScensus2010tract)) install.tract("osx")
+library(UScensus2010tract)
+```
+
+### Question 2(a)	
+Plot a map of New York census tracts using the plot function.
+```{r}
+data(new_york.tract10)
+shpfile <- new_york.tract10
+
+df <- shpfile@data
+df
+plot(shpfile)
+```
+
+### Question 2(b)
+Compute the total population based on census tracts.
+```{r}
+df
+newpop <- df$P0010001
+
+snew <- sum(newpop)
+snew
+```
+
+### Question 2(c)
+Select all census tracts in Broome County and plot the map. 
+```{r}
+broome <- county(fips="007",name="Broome",state="NY",level="tract")
+plot(broome)
+```
+
+### Question 2(d)
+What’s the total population of Broome County?
+```{r}
+bpop <- sum(broome$P0010001)
+bpop
+```
+
+### Question 2(e)
+Create a histogram and a boxplot of population based on census tracts of Broome County.
+```{r}
+hist(broome$P0010001)
+
+boxplot(broome$P0010001)
+```
+
+### Question 2(f)
+Select the first five columns of the shapefile of Broome County census tract; add a new population ratio column (= census tract population / county population); save the new shapefile to the hard drive. 
+```{r}
+popra <- data.frame(broome[,1:5])
+popra$ratio <- broome$P0010001/200600
+popra
+```
+
+
+## Question 3
+
+Use R packages raster and ncdf4 to complete the following tasks:     (20 pt.)
+```{r}
+library(raster)
+library(ncdf4)
+```
+
+### Question 3(a)		
+Load the multi-band raster dataset “NDVI.nc” into R.
+```{r}
+ndvi <- raster("NDVI.nc")
+```
+
+### Question 3(b)		
+Get the basic information about the dataset, including the number of rows, columns, cells, and bands; spatial resolution, extent, bounding box, and projection.
+```{r}
+nrow(ndvi)
+ncol(ndvi)
+ncell(ndvi)
+nbands(ndvi)
+res(ndvi)
+extent(ndvi)
+bbox(ndvi)
+projection(ndvi)
+```
+
+### Question 3(c)	
+Aggregate all bands to generate a mean NDVI raster and a maximum NDVI raster; save the two new raster datasets to the hard drive. 
+```{r}
+ndvi.rb <- brick("ndvi.nc")
+meanndvi <- mean(ndvi.rb)
+plot(meanndvi)
+writeRaster(meanndvi,filename = "meanndvi.tif",overwrite=TRUE)
+maxndvi <- max(ndvi.rb)
+plot(maxndvi)
+writeRaster(maxndvi,filename = "maxndvi.tif",overwrite=TRUE)
+```
+
+### Question 3(d)			
+Plot the maps of monthly NDVI of the year 2001
+```{r}
+ndvi2k <- ndvi.rb[[13:24]]
+plot(ndvi2k)
+```
+
+### Question 3(e)	
+Create histograms of monthly NDVI of the year 2001.
+```{r}
+hist(ndvi2k)
+```
+
+### Question 3(f)			
+Plot the NDVI map of July 2000; click any location with data on the map and retrieve the NDVI time series for all years; plot the NDVI time series of the selected location. 
+```{r}
+plot(ndvi.rb,7) 
+location <- ndvi.rb[150, 50]
+location <- click(ndvi.rb, n=1, xy=TRUE)
+location <- click(ndvi.rb, n=1, xy=FALSE)
+```
+
